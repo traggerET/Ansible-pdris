@@ -1,0 +1,29 @@
+---
+- hosts: "all"
+  tasks:
+  - name: clone flask app
+    git:
+      repo: https://github.com/traggerET/FlaskApp.git
+      dest: src/
+
+  - name: copy Dockerfile
+    copy:
+      src: ./Dockerfile
+      dest: src/Dockerfile
+      owner: root
+      group: root
+      mode: '0777'
+
+  - name: create image
+    docker_image:
+      name: mytime_app
+      build:
+        path: src/
+      source: build
+      state: present
+
+  - name: run app
+    docker_container:
+      name: mytime_app
+      image: mytime_app
+      command: ["python3", "mytime.py"]
